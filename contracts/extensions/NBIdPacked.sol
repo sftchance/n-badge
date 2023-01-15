@@ -73,7 +73,7 @@ contract NBIdPacked is Auth, Authority {
             i >>= 8
         ) {
             /// @dev Get the value of the node.
-            uint256 value = nodeIds & 0xff;
+            uint256 value = i & 0xff;
 
             /// @dev Check if the user has the required badge.
             if(badge.balanceOf(user, value) == 0) return false;
