@@ -8,13 +8,13 @@ import {Auth, Authority} from "solmate/src/auth/Auth.sol";
 /// @dev Helpers.
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
-contract NBMultiBalance is Auth, Authority {
+contract NBMultiBalancePoints is Auth, Authority {
     /// @dev The schema of node in the authority graph.
     struct Node {
         IERC1155 badge;
-        uint8 mandatory;
         uint256 id;
         uint256 balance;
+        uint256 points;
     }
 
     ////////////////////////////////////////////////////////
@@ -60,26 +60,28 @@ contract NBMultiBalance is Auth, Authority {
         bytes4
     ) public view override returns (bool) {
         /// @dev Load in the stack.
-        uint256 carried;
+        uint256 points;
         uint256 i;
 
         /// @dev Get the node at the current index.
-        Node memory node = nodes[carried];
+        Node memory node = nodes[0];
 
         /// @dev Determine if the user has met the proper conditions of access.
-        for(i; i < nodes.length; i++) {
-            /// @dev Step through the nodes until we have enough carried or we run out.
+        for (i; i < nodes.length; i++) {
+            /// @dev Step through the nodes until we have enough points or we run out.
             node = nodes[i];
 
-            /// @dev If the user has sufficient balance, account for 1 carried.
-            if(node.badge.balanceOf(user, node.id) >= node.balance) carried++;
-            /// @dev If the node is required and balance is insufficient, we can't continue.
-            else if(node.mandatory == 1) return false; 
+            /// @dev If the user has sufficient balance, account for 1 points.
+            if (node.badge.balanceOf(user, node.id) >= node.balance)
+                points += node.points;
+            
+            /// @dev If enough points have been accumulated, return true.
+            if (points >= required) i = nodes.length;
 
             /// @dev Keep on swimming.
         }
 
         /// @dev Final check if no mandatory badges had an insufficient balance.
-        return carried >= required;
+        return points >= required;
     }
 }
