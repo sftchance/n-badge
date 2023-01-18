@@ -3,12 +3,9 @@
 pragma solidity ^0.8.17;
 
 /// @dev Core dependencies.
-import {Auth, Authority} from "solmate/src/auth/Auth.sol";
-
-/// @dev Helpers.
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
-contract NBMultiBalance is Auth, Authority {
+contract NBMultiBalanceDynamic {
     /// @dev The schema of node in the authority graph.
     struct Node {
         IERC1155 badge;
@@ -22,31 +19,33 @@ contract NBMultiBalance is Auth, Authority {
     ////////////////////////////////////////////////////////
 
     /// @dev The number of required badges to access a function.
-    uint256 public immutable required;
+    uint256 public required;
 
     /// @dev The nodes that make up the authority.
     Node[] public nodes;
 
-    /// @dev Initialize the ownership of the contract.
-    constructor(uint256 _required) Auth(msg.sender, Authority(address(0))) {
-        required = _required;
-    }
-
     ////////////////////////////////////////////////////////
-    ///                     SETTERS                      ///
+    ///                INTERNAL SETTERS                  ///
     ////////////////////////////////////////////////////////
 
     /**
-     * @dev Allows the authorized owner of the Credential Scanner to add a node to the authority graph.
-     * @param node The node to add.
+     * @dev Allows the authorized owner to update the required badges. 
+     * @param _required The new required badges.
      */
-    function addNode(Node calldata node) public requiresAuth {
-        /// @dev Add the node to the graph.
-        nodes.push(node);
+    function _setRequired(uint256 _required) internal {
+        required = _required;
+    }
+
+    /**
+     * @dev Allows the authorized owner to update the nodes.
+     * @param _nodes The new nodes.
+     */
+    function _setNodes(Node[] memory _nodes) internal {
+        nodes = _nodes;
     }
 
     ////////////////////////////////////////////////////////
-    ///                     GETTERS                      ///
+    ///                 INTERNAL GETTERS                 ///
     ////////////////////////////////////////////////////////
 
     /**
@@ -54,11 +53,11 @@ contract NBMultiBalance is Auth, Authority {
      * @param user The user to check.
      * @return True if the user has the required credentials, false otherwise.
      */
-    function canCall(
+    function _canCall(
         address user,
         address,
         bytes4
-    ) public view override returns (bool) {
+    ) internal view returns (bool) {
         /// @dev Load in the stack.
         uint256 carried;
         uint256 i;

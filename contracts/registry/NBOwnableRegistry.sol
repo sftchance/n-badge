@@ -20,7 +20,7 @@ interface IOwnable {
 
 /**
  * @title NBOwnableRegistry
- * @dev This is a a registry that allows instant decentralization and usage of Badge-driven 
+ * @dev This is a a registry that allows instant decentralization and usage of Badge-driven
  *      access moduels by connecting them to targets. All a user has to do is call connect
  *      and then transfer the ownership of the contract to the registry. The registry will
  *      then be able to manage the access control of the target.
@@ -46,7 +46,7 @@ contract NBOwnableRegistry is Auth, Authority {
 
     /// @dev Emitted when a module is disabled.
     event ModuleDisabled(address indexed module);
-    
+
     /// @dev Emitted when a module is connected to a target.
     event ModuleConnected(
         address indexed target,
