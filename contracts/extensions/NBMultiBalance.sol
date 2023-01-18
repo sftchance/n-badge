@@ -5,7 +5,7 @@ pragma solidity ^0.8.17;
 /// @dev Core dependencies.
 import {IERC1155} from "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 
-contract NBMultiBalanceDynamic {
+contract NBMultiBalance {
     /// @dev The schema of node in the authority graph.
     struct Node {
         IERC1155 badge;
@@ -29,7 +29,7 @@ contract NBMultiBalanceDynamic {
     ////////////////////////////////////////////////////////
 
     /**
-     * @dev Allows the authorized owner to update the required badges. 
+     * @dev Allows the authorized owner to update the required badges.
      * @param _required The new required badges.
      */
     function _setRequired(uint256 _required) internal {
@@ -66,14 +66,15 @@ contract NBMultiBalanceDynamic {
         Node memory node = nodes[carried];
 
         /// @dev Determine if the user has met the proper conditions of access.
-        for(i; i < nodes.length; i++) {
+        for (i; i < nodes.length; i++) {
             /// @dev Step through the nodes until we have enough carried or we run out.
             node = nodes[i];
 
             /// @dev If the user has sufficient balance, account for 1 carried.
-            if(node.badge.balanceOf(user, node.id) >= node.balance) carried++;
-            /// @dev If the node is required and balance is insufficient, we can't continue.
-            else if(node.mandatory == 1) return false; 
+            if (node.badge.balanceOf(user, node.id) >= node.balance)
+                carried++;
+                /// @dev If the node is required and balance is insufficient, we can't continue.
+            else if (node.mandatory == 1) return false;
 
             /// @dev Keep on swimming.
         }
